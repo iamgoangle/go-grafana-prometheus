@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-	"html"
 	"log"
 	"math/rand"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var (
@@ -39,23 +38,29 @@ func init() {
 	prometheus.MustRegister(submitPolicyTotal)
 }
 
-func main() {
+func Index(w http.ResponseWriter, r *http.Request) {
 	cpuTemp.Set(65.3)
 	hdFailures.With(prometheus.Labels{"device": "/dev/sda"}).Inc()
+}
 
-	// The Handler function provides a default handler to expose metrics
-	// via an HTTP server. "/metrics" is the usual endpoint for that.
-	http.Handle("/metrics", promhttp.Handler())
-	http.HandleFunc("/submit", func(w http.ResponseWriter, r *http.Request) {
-		passed := "false"
-		if rand.Intn(100) > 50 {
-			passed = "true"
-		}
+func MetricSubmitInfo(w http.ResponseWriter, r *http.Request) {
+	log.Println("submit info metric")
+	passed := "false"
+	if rand.Intn(100) > 50 {
+		passed = "true"
+	}
 
-		submitPolicyTotal.With(prometheus.Labels{"success": passed}).Inc()
-		fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
-		fmt.Println(submitPolicyTotal)
-	})
+	submitPolicyTotal.With(prometheus.Labels{"success": passed}).Inc()
+	fmt.Fprintln(w, "MetricSubmitInfo")
+}
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+func main() {
+	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/", Index)
+	router.HandleFunc("/submit", MetricSubmitInfo)
+	router.Handle("/metrics", prometheus.Handler())
+
+	// http.Handle("/metrics", promhttp.Handler())
+
+	log.Fatal(http.ListenAndServe(":8080", router))
 }

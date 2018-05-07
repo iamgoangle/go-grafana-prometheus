@@ -14,6 +14,18 @@
   version = "v1.1.0"
 
 [[projects]]
+  name = "github.com/gorilla/context"
+  packages = ["."]
+  revision = "1ea25387ff6f684839d82767c1733ff4d4d15d0a"
+  version = "v1.1"
+
+[[projects]]
+  name = "github.com/gorilla/mux"
+  packages = ["."]
+  revision = "53c1911da2b537f792e7cafcb446b05ffe33b996"
+  version = "v1.6.1"
+
+[[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
   packages = ["pbutil"]
   revision = "3247c84500bff8d9fb6d579d800f20b3e091582c"
@@ -58,6 +70,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d26fb00b85e79280581e3e21855792ca0d1c72beacfa66fa2801310b84d598f2"
+  inputs-digest = "b12e69cf5aadd777028cc1b7a1326f13adaaeb1af25e65bca163c8fa7c7fc709"
   solver-name = "gps-cdcl"
   solver-version = 1
