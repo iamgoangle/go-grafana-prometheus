@@ -1,12 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -22,13 +19,7 @@ var (
 		},
 		[]string{"device"},
 	)
-	submitPolicyTotal = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "submit_policy",
-			Help: "Number of pushes to submit policy etl.",
-		},
-		[]string{"success"},
-	)
+	submitPolicyTotal = MakeSubmitCounter()
 )
 
 func init() {
@@ -43,24 +34,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	hdFailures.With(prometheus.Labels{"device": "/dev/sda"}).Inc()
 }
 
-func MetricSubmitInfo(w http.ResponseWriter, r *http.Request) {
-	log.Println("submit info metric")
-	passed := "false"
-	if rand.Intn(100) > 50 {
-		passed = "true"
-	}
-
-	submitPolicyTotal.With(prometheus.Labels{"success": passed}).Inc()
-	fmt.Fprintln(w, "MetricSubmitInfo")
-}
-
 func main() {
-	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/", Index)
-	router.HandleFunc("/submit", MetricSubmitInfo)
-	router.Handle("/metrics", prometheus.Handler())
-
-	// http.Handle("/metrics", promhttp.Handler())
-
+	router := CreateRouter()
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

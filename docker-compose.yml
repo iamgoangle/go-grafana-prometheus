@@ -1,19 +1,44 @@
-version: "3"
+version: "3.1"
+
+volumes:
+    prometheus_data: {}
+    grafana_data: {}
+
+networks:
+  back-tier:    
+
 services:
   prometheus:
-    image: quay.io/prometheus/prometheus:v2.0.0
+    image: prom/prometheus:v2.1.0
+    # volumes:
+    #   - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    command: "--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus"
+    - ./prometheus/:/etc/prometheus/
+    - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=20d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
     ports:
       - 9090:9090
+    networks:
+      - back-tier
+    restart: always
+
   grafana:
     image: grafana/grafana
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./grafana:/var/lib/grafana
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=golf
     depends_on:
       - prometheus
+    ports:
+      - "3000:3000"
+    networks:
+      - back-tier  
+    volumes:
+      - ./grafana:/var/lib/grafana
+    env_file:
+      - ./grafana/config.monitoring
+    depends_on:
+      - prometheus
+    restart: always
