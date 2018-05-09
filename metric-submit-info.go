@@ -10,17 +10,20 @@ import (
 )
 
 type SubmitInfo struct {
-	Name    string `json:"name"`
-	Success string `json:"success"`
+	Code   string `json:"code"`
+	Method string `json:"method"`
+	Status string `json:"status"`
 }
+
+var LABELS = []string{"code", "method", "status"}
 
 func MakeSubmitCounter() *prometheus.CounterVec {
 	prom := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "submit_policy",
-			Help: "Number of pushes to submit policy etl.",
+			Name: "proc_submit_data_total",
+			Help: "Number of pushes to submit data total.",
 		},
-		[]string{"success"},
+		LABELS,
 	)
 
 	return prom
@@ -35,11 +38,13 @@ func MetricSubmitInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	submit := SubmitInfo{
-		Name:    "Submit new policy",
-		Success: passed,
+		Code:   "200",
+		Method: "GET",
+		Status: passed,
 	}
 
-	submitPolicyTotal.With(prometheus.Labels{"success": passed}).Inc()
+	// procSubmitData.With(prometheus.Labels{"code": "200", "method": "GET", "status": passed}).Inc()
+	procSubmitData.WithLabelValues("200", "GET", passed)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
