@@ -43,7 +43,7 @@ func MetricSubmitInfo(w http.ResponseWriter, r *http.Request) {
 		Status: passed,
 	}
 
-	// procSubmitData.With(prometheus.Labels{"code": "200", "method": "GET", "status": passed}).Inc()
+	procSubmitData.With(prometheus.Labels{"code": "200", "method": "GET", "status": passed}).Inc()
 	procSubmitData.WithLabelValues("200", "GET", passed)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")

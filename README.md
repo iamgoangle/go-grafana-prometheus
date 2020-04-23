@@ -5,6 +5,10 @@ This is a simple project to demonstrate **Golang** with **Prometheus** time seri
 This project using docker for service container
 
 Do not using all code on your production !!!
+
+# configure
+Replace `REPLACE_WITH_LOCAL_IP` with for example `192.168.1.2` in `prometheus/prometheus.yml`
+
 # run
 ## [1] api
 ```sh
