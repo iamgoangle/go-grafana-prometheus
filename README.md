@@ -14,6 +14,11 @@ make run-go
 ```sh
 docker-compose up
 ```
+## [3] test
+call the following url to increment the 2 counters: ``http://localhost:8080/submit``
+and connect to prometheus: ``http://localhost:9090/``
+or connect to grafana: ``http://localhost:3000/``
+
 
 # todo
 - seperate func to package instead using one package main
